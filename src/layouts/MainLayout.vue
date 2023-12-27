@@ -1,19 +1,8 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header elevated class="centered-header">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-toolbar-title class="centered-title"> Quasar App </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -83,6 +72,17 @@ export default defineComponent({
 
 <style scoped>
 /* Custom CSS to style the Quick Links section */
+.centered-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px; /* Increase the header height as needed */
+}
+
+.centered-title {
+  text-align: center; /* Center the title text */
+}
+
 .quick-links {
   display: flex;
   justify-content: center;
