@@ -59,16 +59,47 @@ export default {
   z-index: 5;
   display: flex;
   align-items: center;
+  padding-right: 30px; /* Space for the clear button */
+  background-color: white;
+  border-radius: 20px; /* Rounded edges */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: adds subtle shadow */
 }
 
 .search-input {
   width: 300px;
   padding: 10px;
+  padding-right: 40px; /* Increased right padding to prevent text overlap */
+  border: none;
+  border-radius: 20px; /* Rounded edges */
+  outline: none; /* Removes the default focus outline */
+  overflow: hidden; /* Prevent text overflow */
+  white-space: nowrap; /* No wrapping of text */
+  text-overflow: ellipsis; /* Add ellipsis for overflowed text */
 }
 
 button {
-  padding: 5px 10px;
-  margin-left: 5px;
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
   cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  color: #666; /* Adjust color as needed */
+}
+
+button:hover {
+  color: #333; /* Darker color on hover */
+}
+
+/* Hide the button when searchQuery is empty */
+button[disabled] {
+  display: none;
+}
+
+/* Optional: Add a transition effect for hover */
+.search-input,
+button {
+  transition: all 0.3s ease;
 }
 </style>

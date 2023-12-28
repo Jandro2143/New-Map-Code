@@ -1,11 +1,5 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="centered-header">
-      <q-toolbar>
-        <q-toolbar-title class="centered-title"> Quasar App </q-toolbar-title>
-      </q-toolbar>
-    </q-header>
-
     <q-page-container>
       <router-view />
     </q-page-container>
