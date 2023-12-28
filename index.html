@@ -40,6 +40,30 @@
   </head>
   <body>
     <!-- quasar:entry-point -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJ7SzrgJmRF8tVwGTj3AbYUHG6lnnbNyg&callback=initMap"></script>
+    <div id="app"></div>
+    <script>
+      function initMap() {
+        const mapDiv = document.getElementById("map");
+        if (mapDiv) {
+          const map = new google.maps.Map(mapDiv, {
+            center: { lat: -34.397, lng: 150.644 }, // Default location
+            zoom: 15,
+            mapTypeControl: false, // Disable the map button
+            fullscreenControl: false, // Disable the expand button
+          });
+
+          new google.maps.Marker({
+            position: { lat: -34.397, lng: 150.644 }, // Default location
+            map: map,
+            title: "Your Location",
+          });
+        }
+      }
+    </script>
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJ7SzrgJmRF8tVwGTj3AbYUHG6lnnbNyg&callback=initMap&libraries=places"
+    ></script>
   </body>
 </html>

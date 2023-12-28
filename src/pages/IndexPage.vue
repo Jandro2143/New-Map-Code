@@ -1,79 +1,124 @@
 <template>
   <q-page class="map-container">
     <div id="map"></div>
-    <div class="search-bar">
-      <input id="destination-search" placeholder="Enter a destination" />
-    </div>
+    <map-search-box
+      v-if="map"
+      :map="map"
+      @place-selected="handlePlaceSelected"
+      @search-cleared="clearSearch"
+    />
   </q-page>
 </template>
 
 <script>
 import { defineComponent, ref, onMounted } from "vue";
+import MapSearchBox from "C:/Users/Alejandro Cedillo/OneDrive - Carbiz Rentals/Desktop/REAL MAP CODE/New-Map-Code/src/components/MapSearchBox.vue"; // Adjust the path as needed
 
 export default defineComponent({
   name: "IndexPage",
+  components: {
+    MapSearchBox,
+  },
   setup() {
     const map = ref(null);
-    const currentLocation = ref({ lat: -34.397, lng: 150.644 }); // Default location
+    let directionsRenderer = null; // Reference to the directions renderer
 
     onMounted(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            currentLocation.value = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            initMap();
-          },
-          () => {
-            console.warn("Geolocation failed. Using default location.");
-            initMap();
-          }
-        );
-      } else {
-        console.warn("Geolocation is not supported by this browser.");
-        initMap();
-      }
+      initMap();
     });
 
     const initMap = () => {
-      map.value = new google.maps.Map(document.getElementById("map"), {
-        center: currentLocation.value,
-        zoom: 8,
-      });
-      const directionsService = new google.maps.DirectionsService();
-      const directionsRenderer = new google.maps.DirectionsRenderer();
-      directionsRenderer.setMap(map.value);
+      const defaultLocation = { lat: -34.397, lng: 150.644 }; // Default location
 
-      const input = document.getElementById("destination-search");
-      const searchBox = new google.maps.places.SearchBox(input);
-      map.value.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-      searchBox.addListener("places_changed", () => {
-        const places = searchBox.getPlaces();
-        if (places.length === 0) return;
-        const destination = places[0].geometry.location;
-
-        directionsService.route(
-          {
-            origin: currentLocation.value,
-            destination: destination,
-            travelMode: google.maps.TravelMode.DRIVING,
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const currentLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            console.log("Current Location:", currentLocation); // Debug statement
+            map.value = createMap(currentLocation);
+            addMarker(map.value, currentLocation);
           },
-          (response, status) => {
-            if (status === google.maps.DirectionsStatus.OK) {
-              directionsRenderer.setDirections(response);
-            } else {
-              window.alert("Directions request failed due to " + status);
-            }
+          () => {
+            console.log("Geolocation error"); // Debug statement
+            map.value = createMap(defaultLocation); // Fallback to default location
+            addMarker(map.value, defaultLocation);
           }
         );
+      } else {
+        console.log("Geolocation not supported"); // Debug statement
+        map.value = createMap(defaultLocation); // Geolocation not supported
+        addMarker(map.value, defaultLocation);
+      }
+    };
+
+    const createMap = (location) => {
+      const mapElement = document.getElementById("map");
+      console.log("Map Element:", mapElement); // Debug statement
+
+      if (!mapElement) {
+        console.error("Map element not found"); // Debug statement
+        return null;
+      }
+
+      return new google.maps.Map(mapElement, {
+        center: location,
+        zoom: 15,
+        mapTypeControl: false, // Disable the map button
+        fullscreenControl: false, // Disable the expand button
       });
+    };
+
+    const addMarker = (map, location) => {
+      if (!map) {
+        console.error("Map is null, cannot add marker"); // Debug statement
+        return;
+      }
+
+      new google.maps.Marker({
+        position: location,
+        map: map,
+        title: "Your Location",
+      });
+    };
+
+    const handlePlaceSelected = (destination) => {
+      if (directionsRenderer) {
+        directionsRenderer.setMap(null); // Remove previous directions from the map
+      }
+
+      directionsRenderer = new google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(map.value);
+
+      const directionsService = new google.maps.DirectionsService();
+      directionsService.route(
+        {
+          origin: map.value.center,
+          destination: destination,
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (response, status) => {
+          if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(response);
+          } else {
+            alert("Directions request failed due to " + status);
+          }
+        }
+      );
+    };
+
+    const clearSearch = () => {
+      if (directionsRenderer) {
+        directionsRenderer.setMap(null); // Remove directions when clearing search
+      }
     };
 
     return {
       map,
+      handlePlaceSelected,
+      clearSearch,
     };
   },
 });
@@ -82,32 +127,11 @@ export default defineComponent({
 <style>
 .map-container {
   width: 100%;
-  height: 90vh;
+  height: 80vh;
 }
 
 #map {
   width: 100%;
   height: 100%;
-}
-
-.search-bar {
-  position: absolute;
-  top: 20px; /* Adjust this as needed */
-  left: 50%;
-  transform: translate(-50%, 0);
-  z-index: 5;
-  background-color: white;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  width: 400px;
-}
-
-#destination-search {
-  width: 100%;
-  border: 1px solid #ddd;
-  padding: 12px 15px;
-  border-radius: 4px;
-  box-sizing: border-box;
 }
 </style>
